@@ -1,5 +1,6 @@
-import re
 from typing import List, Tuple, Optional
+
+from smoljson import util
 
 
 TOKENS_WHITESPACE = set([" ", "\n", "\r" "\t"])
@@ -13,22 +14,15 @@ TOKEN_FALSE = "false"
 TOKEN_TRUE = "true"
 TOKEN_QUOTE = '"'
 
-REGEX_NUMBER = re.compile(
-    pattern=r"""
-    -?                # optional negative sign
-    (?:0|[1-9]\d*)    # starts with 0 digit OR 1-9 digit followed by 0+ digits
-    (?:\.\d+)?        # optional decimal followed by 1+ digits
-    (?:[eE][-+]?\d+)? # optional exponential notation
-    """,
-    flags=re.VERBOSE,
-)
-
 
 class LexicalError(ValueError):
+    """Raised if character found while tokenizing is invalid"""
+
     pass
 
 
 def tokenize(s: str) -> List[str]:
+    """Return list of JSON tokens from a string - no whitespace included"""
     tokens = []
     while len(s):
         token, s = _string(s)
@@ -71,7 +65,7 @@ def tokenize(s: str) -> List[str]:
 
 
 def _string(s: str) -> Tuple[Optional[str], str]:
-    """Return first string, if it exists"""
+    """Return first string token it exists"""
     if s[0] == TOKEN_QUOTE:
         for i, c in enumerate(s[1:], start=1):
             if c == TOKEN_QUOTE:
@@ -82,7 +76,7 @@ def _string(s: str) -> Tuple[Optional[str], str]:
 
 
 def _null(s: str) -> Tuple[Optional[str], str]:
-    """Return 'null' if it exists"""
+    """Return first null token if it exists"""
     n = len(TOKEN_NULL)
     if s[:n] == TOKEN_NULL:
         return s[:n], s[n:]
@@ -91,7 +85,7 @@ def _null(s: str) -> Tuple[Optional[str], str]:
 
 
 def _bool(s: str) -> Tuple[Optional[str], str]:
-    """Return 'true' or 'false' if they exist"""
+    """Return first bool token if it exists"""
     n = len(TOKEN_FALSE)
     if s[:n] == TOKEN_FALSE:
         return s[:n], s[n:]
@@ -102,8 +96,8 @@ def _bool(s: str) -> Tuple[Optional[str], str]:
 
 
 def _number(s: str) -> Tuple[Optional[str], str]:
-    """Return number if it exists"""
-    match = REGEX_NUMBER.match(s)
+    """Return first number token if it exists"""
+    match = util.REGEX_NUMBER.match(s)
     if match is not None:
         number = match[0]
         if "." in number:
