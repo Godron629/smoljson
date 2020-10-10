@@ -28,25 +28,25 @@ class LexicalError(ValueError):
     pass
 
 
-def lexer(s: str) -> List[str]:
+def tokenize(s: str) -> List[str]:
     tokens = []
     while len(s):
-        token, s = lex_string(s)
+        token, s = _string(s)
         if token is not None:
             tokens.append(token)
             continue
 
-        token, s = lex_null(s)
+        token, s = _null(s)
         if token is not None:
             tokens.append(token)
             continue
 
-        token, s = lex_bool(s)
+        token, s = _bool(s)
         if token is not None:
             tokens.append(token)
             continue
 
-        token, s = lex_number(s)
+        token, s = _number(s)
         if token is not None:
             tokens.append(token)
             continue
@@ -70,7 +70,7 @@ def lexer(s: str) -> List[str]:
     return tokens
 
 
-def lex_string(s: str) -> Tuple[Optional[str], str]:
+def _string(s: str) -> Tuple[Optional[str], str]:
     """Return first string, if it exists"""
     if s[0] == TOKEN_QUOTE:
         for i, c in enumerate(s[1:], start=1):
@@ -81,7 +81,7 @@ def lex_string(s: str) -> Tuple[Optional[str], str]:
         return None, s
 
 
-def lex_null(s: str) -> Tuple[Optional[str], str]:
+def _null(s: str) -> Tuple[Optional[str], str]:
     """Return 'null' if it exists"""
     n = len(TOKEN_NULL)
     if s[:n] == TOKEN_NULL:
@@ -90,7 +90,7 @@ def lex_null(s: str) -> Tuple[Optional[str], str]:
         return None, s
 
 
-def lex_bool(s: str) -> Tuple[Optional[str], str]:
+def _bool(s: str) -> Tuple[Optional[str], str]:
     """Return 'true' or 'false' if they exist"""
     n = len(TOKEN_FALSE)
     if s[:n] == TOKEN_FALSE:
@@ -101,7 +101,7 @@ def lex_bool(s: str) -> Tuple[Optional[str], str]:
     return None, s
 
 
-def lex_number(s: str) -> Tuple[Optional[str], str]:
+def _number(s: str) -> Tuple[Optional[str], str]:
     """Return number if it exists"""
     match = REGEX_NUMBER.match(s)
     if match is not None:
