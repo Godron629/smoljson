@@ -27,16 +27,16 @@ class TestLexer(TestCase):
 
 
 class TestLexString(TestCase):
-    def test_not_string(self):
-        self.assertEqual(core.lex_string("{}"), (None, "{}"))
-
-    def test_empty_string(self):
+    def test_is_empty(self):
         self.assertEqual(core.lex_string('""'), ("", ""))
 
-    def test_normal_string(self):
+    def test_is_not_string(self):
+        self.assertEqual(core.lex_string("{}"), (None, "{}"))
+
+    def test_is_string(self):
         self.assertEqual(core.lex_string('"hello"'), ("hello", ""))
 
-    def test_normal_string_remaining(self):
+    def test_leftover(self):
         self.assertEqual(core.lex_string('"hello" "other"'), ("hello", ' "other"'))
 
     def test_no_closing_quote_raises_lexical_error(self):
@@ -47,21 +47,24 @@ class TestLexString(TestCase):
 
 
 class TestLexNull(TestCase):
-    def test_empty_string(self):
+    def test_is_empty(self):
         self.assertEqual(core.lex_null(""), (None, ""))
 
-    def test_not_null(self):
+    def test_is_not_null(self):
         self.assertEqual(core.lex_null("none"), (None, "none"))
 
     def test_is_null(self):
         self.assertEqual(core.lex_null("null"), ("null", ""))
 
+    def test_leftover(self):
+        self.assertEqual(core.lex_null("null test"), ("null", " test"))
+
 
 class TestLexBool(TestCase):
-    def test_empty_string(self):
+    def test_is_empty(self):
         self.assertEqual(core.lex_bool(""), (None, ""))
 
-    def test_not_bool(self):
+    def test_is_not_bool(self):
         self.assertEqual(core.lex_bool("none"), (None, "none"))
 
     def test_is_true(self):
@@ -70,12 +73,15 @@ class TestLexBool(TestCase):
     def test_is_false(self):
         self.assertEqual(core.lex_bool("false"), ("false", ""))
 
+    def test_leftover(self):
+        self.assertEqual(core.lex_bool("false test"), ("false", " test"))
+
 
 class TestLexNumber(TestCase):
-    def test_empty_string(self):
+    def test_is_empty(self):
         self.assertEqual(core.lex_number(""), (None, ""))
 
-    def test_not_number(self):
+    def test_is_not_number(self):
         self.assertEqual(core.lex_number('"hello"'), (None, '"hello"'))
 
     def test_is_int(self):
@@ -90,5 +96,5 @@ class TestLexNumber(TestCase):
     def test_is_exponential_notation(self):
         self.assertEqual(core.lex_number("2.99792458e8"), (299792458.0, ""))
 
-    def test_is_leftover(self):
+    def test_leftover(self):
         self.assertEqual(core.lex_number("123 test"), (123, " test"))
