@@ -1,3 +1,4 @@
+import re
 from typing import List, Tuple, Optional
 
 
@@ -11,6 +12,16 @@ TOKEN_NULL = "null"
 TOKEN_FALSE = "false"
 TOKEN_TRUE = "true"
 TOKEN_QUOTE = '"'
+
+REGEX_NUMBER = re.compile(
+    pattern=r"""
+    -?                # optional negative sign
+    (?:0|[1-9]\d*)    # starts with 0 digit OR 1-9 digit followed by 0+ digits
+    (?:\.\d+)?        # optional decimal followed by 1+ digits
+    (?:[eE][-+]?\d+)? # optional exponential notation
+    """,
+    flags=re.VERBOSE,
+)
 
 
 class LexicalError(ValueError):
@@ -36,13 +47,9 @@ def lexer(s: str) -> List[str]:
             continue
 
         token, s = lex_number(s)
-        if token is not None: 
+        if token is not None:
             tokens.append(token)
             continue
-
-        ...
-
-        # change to using i so no string reassign
 
         if s[0] in TOKENS_ARRAY:
             tokens.append(s[0])
@@ -93,24 +100,14 @@ def lex_bool(s: str) -> Tuple[Optional[str], str]:
         return s[:n], s[n:]
     return None, s
 
-def lex_number(s: str) -> Tuple[Optional[str], str]: 
+
+def lex_number(s: str) -> Tuple[Optional[str], str]:
     """Return number if it exists"""
-    negative = False
-    leading_zero = False
-    digits = set(range(10))
-    while len(s): 
-        if s[0] == "-": 
-            if negative: 
-                raise LexicalError("Double minus")
-            negative = True
-            s = s[1:]
-            continue
-        if s[0] == "0": 
-            leading_zero = True
-            s = s[1:]
-            continue
-        if s[0] in digits: 
-            pass
-
-
-
+    match = REGEX_NUMBER.match(s)
+    if match is not None:
+        number = match[0]
+        if "." in number:
+            return float(number), s[len(number) :]
+        else:
+            return int(number), s[len(number) :]
+    return None, s

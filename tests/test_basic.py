@@ -22,6 +22,9 @@ class TestLexer(TestCase):
     def test_token_bool(self):
         self.assertEqual(core.lexer("true false"), ["true", "false"])
 
+    def test_token_number(self):
+        self.assertEqual(core.lexer("[123, 5.0]"), ["[", 123, ",", 5.0, "]"])
+
 
 class TestLexString(TestCase):
     def test_not_string(self):
@@ -66,3 +69,26 @@ class TestLexBool(TestCase):
 
     def test_is_false(self):
         self.assertEqual(core.lex_bool("false"), ("false", ""))
+
+
+class TestLexNumber(TestCase):
+    def test_empty_string(self):
+        self.assertEqual(core.lex_number(""), (None, ""))
+
+    def test_not_number(self):
+        self.assertEqual(core.lex_number('"hello"'), (None, '"hello"'))
+
+    def test_is_int(self):
+        self.assertEqual(core.lex_number("42"), (42, ""))
+
+    def test_is_negative(self):
+        self.assertEqual(core.lex_number("-1"), (-1, ""))
+
+    def test_is_float(self):
+        self.assertEqual(core.lex_number("5.0"), (5.0, ""))
+
+    def test_is_exponential_notation(self):
+        self.assertEqual(core.lex_number("2.99792458e8"), (299792458.0, ""))
+
+    def test_is_leftover(self):
+        self.assertEqual(core.lex_number("123 test"), (123, " test"))
