@@ -1,5 +1,6 @@
 from typing import List, Tuple, Any
 
+
 class ParserError(Exception):
     """Raised if there is an error while parsing"""
 
@@ -21,42 +22,38 @@ def _list(tokens: List):
     ls = []
     if t == "]":
         return ls, tokens[1:]
-    while len(tokens): 
+    while len(tokens):
         val, tokens = parse(tokens)
         ls.append(val)
         t = tokens[0]
-        if t == "]": 
+        if t == "]":
             return ls, tokens[1:]
-        if t != ",": 
+        if t != ",":
             raise ParserError("Expected ',' after list value")
         tokens = tokens[1:]
     raise ParserError("Expected ']' value to close list")
 
-def _object(tokens: List): 
+
+def _object(tokens: List):
     """return python dict from tokens"""
     t = tokens[0]
     _dict = {}
-    if t == "}": 
+    if t == "}":
         return _dict, tokens[1:]
-    while len(tokens): 
+    while len(tokens):
         key = tokens[0]
-        if not isinstance(key, str): 
+        if not isinstance(key, str):
             raise ParserError(f"Excepted string key, got: {key}")
         tokens = tokens[1:]
         t = tokens[0]
-        if t != ":": 
+        if t != ":":
             raise ParserError(f"Expected colon after key, got: {t}")
         val, tokens = parse(tokens[1:])
         _dict[key] = val
         t = tokens[0]
-        if t == "}": 
+        if t == "}":
             return _dict, tokens[1:]
-        if t != ",": 
+        if t != ",":
             raise ParserError(f"Expected comma after value, got: {t}")
         tokens = tokens[1:]
     raise ParserError("Expected '}' value to close object")
-            
-        
-
-
-        

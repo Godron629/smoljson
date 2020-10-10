@@ -17,10 +17,10 @@ class TestTokenize(TestCase):
         self.assertEqual(lexer.tokenize('"hello" "there"'), ["hello", "there"])
 
     def test_token_null(self):
-        self.assertEqual(lexer.tokenize("null"), ["null"])
+        self.assertEqual(lexer.tokenize("null"), [None])
 
     def test_token_bool(self):
-        self.assertEqual(lexer.tokenize("true false"), ["true", "false"])
+        self.assertEqual(lexer.tokenize("true false"), [True, False])
 
     def test_token_number(self):
         self.assertEqual(lexer.tokenize("[123, 5.0]"), ["[", 123, ",", 5.0, "]"])
@@ -54,10 +54,10 @@ class TestLexNull(TestCase):
         self.assertEqual(lexer._null("none"), (None, "none"))
 
     def test_is_null(self):
-        self.assertEqual(lexer._null("null"), ("null", ""))
+        self.assertEqual(lexer._null("null"), (True, ""))
 
     def test_leftover(self):
-        self.assertEqual(lexer._null("null test"), ("null", " test"))
+        self.assertEqual(lexer._null("null test"), (True, " test"))
 
 
 class TestLexBool(TestCase):
@@ -68,13 +68,13 @@ class TestLexBool(TestCase):
         self.assertEqual(lexer._bool("none"), (None, "none"))
 
     def test_is_true(self):
-        self.assertEqual(lexer._bool("true"), ("true", ""))
+        self.assertEqual(lexer._bool("true"), (True, ""))
 
     def test_is_false(self):
-        self.assertEqual(lexer._bool("false"), ("false", ""))
+        self.assertEqual(lexer._bool("false"), (False, ""))
 
     def test_leftover(self):
-        self.assertEqual(lexer._bool("false test"), ("false", " test"))
+        self.assertEqual(lexer._bool("false test"), (False, " test"))
 
 
 class TestLexNumber(TestCase):

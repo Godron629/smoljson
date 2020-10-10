@@ -31,8 +31,10 @@ def tokenize(s: str) -> List[str]:
             continue
 
         token, s = _null(s)
-        if token is not None:
-            tokens.append(token)
+        if token is True:
+            # None means no token found, except the token _is_ `None`. To be
+            # consistent `_null` returns True if token is found, None otherwise.
+            tokens.append(None)
             continue
 
         token, s = _bool(s)
@@ -79,7 +81,7 @@ def _null(s: str) -> Tuple[Optional[str], str]:
     """Return first null token if it exists"""
     n = len(TOKEN_NULL)
     if s[:n] == TOKEN_NULL:
-        return s[:n], s[n:]
+        return True, s[n:]
     else:
         return None, s
 
@@ -88,10 +90,10 @@ def _bool(s: str) -> Tuple[Optional[str], str]:
     """Return first bool token if it exists"""
     n = len(TOKEN_FALSE)
     if s[:n] == TOKEN_FALSE:
-        return s[:n], s[n:]
+        return False, s[n:]
     n = len(TOKEN_TRUE)
     if s[:n] == TOKEN_TRUE:
-        return s[:n], s[n:]
+        return True, s[n:]
     return None, s
 
 
