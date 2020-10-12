@@ -6,7 +6,7 @@ from smoljson import util
 TOKENS_WHITESPACE = set([" ", "\n", "\r" "\t"])
 
 TOKENS_ARRAY = set(["[", "]", ","])
-TOKENS_OBJECT = set(["{", "}", ":"])
+TOKENS_OBJECT = set(["{", "}", ":", ","])
 TOKENS_JSON = TOKENS_ARRAY.union(TOKENS_OBJECT)
 
 TOKEN_NULL = "null"
@@ -101,6 +101,7 @@ def _number(s: str) -> Tuple[Optional[str], str]:
     """Return first number token if it exists"""
     match = util.REGEX_NUMBER.match(s)
     if match is not None:
+        # Convert string number to float or int, retain original data type
         number = match[0]
         if "." in number:
             return float(number), s[len(number) :]

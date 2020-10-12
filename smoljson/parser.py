@@ -8,6 +8,9 @@ class ParserError(Exception):
 
 
 def parse(tokens: List[str]):
+    """Return JSON dict from tokens"""
+    if not tokens:
+        raise ParserError("Expected value")
     t = tokens[0]
     if t == "[":
         return _list(tokens[1:])
